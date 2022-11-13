@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import TodoList from '../entities/TodoList';
 import TodoGateway from '../gateways/TodoGateway';
 
 function generateId() {
@@ -9,78 +10,48 @@ type TodoListViewProps = {
   todoGateway: TodoGateway;
 };
 
+// await todoGateway.addItem(item);
+// await todoGateway.removeItem(item.id);
+// await todoGateway.updateItem(toggledItem);
+
 const TodoListView = ({ todoGateway }: TodoListViewProps) => {
   const [description, setDescription] = useState('');
-  const [todos, setTodos] = useState<
-    { id: string; description: string; done: boolean }[]
-  >([]);
+  const [data, setData] = useState({
+    todoList: new TodoList(),
+  });
 
   useEffect(() => {
     (async () => {
       const fetchedTodos = await todoGateway.getTodos();
-      setTodos(fetchedTodos);
+      setData({ todoList: fetchedTodos });
     })();
   }, []);
 
-  async function addItem(description: string) {
-    if (!description) return;
-    if (todos.some((item: any) => item.description === description)) return;
-    if (todos.filter((item: any) => !item.done).length > 4) return;
-    const item = {
-      id: generateId(),
-      description,
-      done: false,
-    };
-    setTodos((previousTodos) => {
-      return [...previousTodos, item];
-    });
-    setDescription('');
-    await todoGateway.addItem(item);
-  }
-
-  async function removeItem(item: any) {
-    setTodos((previousTodos) => {
-      const newTodos = [...previousTodos];
-      newTodos.splice(todos.indexOf(item), 1);
-      return newTodos;
-    });
-    await todoGateway.removeItem(item.id);
-  }
-
-  async function toggleDone(item: any) {
-    const toggledItem = {
-      id: item.id,
-      description: item.description,
-      done: !item.done,
-    };
-    setTodos((previousItems) => {
-      return previousItems.map((previousItem) =>
-        previousItem.id === item.id ? toggledItem : previousItem,
-      );
-    });
-    await todoGateway.updateItem(toggledItem);
-  }
-
-  const completed = useCallback(() => {
-    const total = todos.length;
-    const done = todos.filter((item: any) => item.done).length;
-    return Math.round((done / total) * 100);
-  }, [todos]);
-
   return (
     <>
-      {todos.length === 0 && <div>No Item</div>}
+      {data?.todoList?.items?.length === 0 && <div>No Item</div>}
       <span
         data-testid='completed'
-        className='completed'
-      >{`${completed()}%`}</span>
-      {todos.map((item: any) => (
+      >{`${data?.todoList?.getCompleted?.() ?? 0}%`}</span>
+      {data?.todoList?.items?.map((item: any) => (
         <div key={item.id}>
           <span style={{ textDecoration: item.done ? 'line-through' : '' }}>
             {item.description}
           </span>
-          <button onClick={() => toggleDone(item)}>Done/Undone</button>
-          <button onClick={() => removeItem(item)}>Remove</button>
+          <button
+            onClick={async () =>
+              setData({ todoList: await data.todoList.toggleDone(item) })
+            }
+          >
+            Done/Undone
+          </button>
+          <button
+            onClick={async () =>
+              setData({ todoList: await data.todoList.removeItem(item) })
+            }
+          >
+            Remove
+          </button>
         </div>
       ))}
       <hr />
@@ -88,8 +59,14 @@ const TodoListView = ({ todoGateway }: TodoListViewProps) => {
         type='text'
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        onKeyUp={(e) => {
-          if (e.key === 'Enter') addItem(description);
+        onKeyUp={async (e) => {
+          if (e.key === 'Enter') {
+            const newTodoList = await data.todoList.addItem(description);
+            if (newTodoList) {
+              setData({ todoList: newTodoList });
+              setDescription('');
+            }
+          }
         }}
       />
     </>
