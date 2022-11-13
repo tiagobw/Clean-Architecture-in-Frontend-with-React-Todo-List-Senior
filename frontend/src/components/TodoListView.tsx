@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
+import TodoGateway from '../gateways/TodoGateway';
 
 function generateId() {
   return 'id' + Math.random().toString(16).slice(2);
 }
 
-const TodoListView = () => {
+type TodoListViewProps = {
+  todoGateway: TodoGateway;
+};
+
+const TodoListView = ({ todoGateway }: TodoListViewProps) => {
   const [description, setDescription] = useState('');
   const [todos, setTodos] = useState<
     { id: string; description: string; done: boolean }[]
@@ -13,8 +17,7 @@ const TodoListView = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await axios.get('http://localhost:3000/todos');
-      const fetchedTodos = response.data;
+      const fetchedTodos = await todoGateway.getTodos();
       setTodos(fetchedTodos);
     })();
   }, []);
@@ -32,7 +35,7 @@ const TodoListView = () => {
       return [...previousTodos, item];
     });
     setDescription('');
-    await axios.post('http://localhost:3000/todos', item);
+    await todoGateway.addItem(item);
   }
 
   async function removeItem(item: any) {
@@ -41,7 +44,7 @@ const TodoListView = () => {
       newTodos.splice(todos.indexOf(item), 1);
       return newTodos;
     });
-    await axios.delete(`http://localhost:3000/todos/${item.id}`);
+    await todoGateway.removeItem(item.id);
   }
 
   async function toggleDone(item: any) {
@@ -55,7 +58,7 @@ const TodoListView = () => {
         previousItem.id === item.id ? toggledItem : previousItem,
       );
     });
-    await axios.put(`http://localhost:3000/todos/${item.id}`, toggledItem);
+    await todoGateway.updateItem(toggledItem);
   }
 
   const completed = useCallback(() => {
@@ -67,7 +70,10 @@ const TodoListView = () => {
   return (
     <>
       {todos.length === 0 && <div>No Item</div>}
-      <span data-testid="completed" className='completed'>{`${completed()}%`}</span>
+      <span
+        data-testid='completed'
+        className='completed'
+      >{`${completed()}%`}</span>
       {todos.map((item: any) => (
         <div key={item.id}>
           <span style={{ textDecoration: item.done ? 'line-through' : '' }}>
