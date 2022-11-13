@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 function generateId() {
@@ -58,9 +58,16 @@ const TodoListView = () => {
     await axios.put(`http://localhost:3000/todos/${item.id}`, toggledItem);
   }
 
+  const completed = useCallback(() => {
+    const total = todos.length;
+    const done = todos.filter((item: any) => item.done).length;
+    return Math.round((done / total) * 100);
+  }, [todos]);
+
   return (
     <>
-      {todos.length === 0 && 'No Item'}
+      {todos.length === 0 && <div>No Item</div>}
+      <span data-testid="completed" className='completed'>{`${completed()}%`}</span>
       {todos.map((item: any) => (
         <div key={item.id}>
           <span style={{ textDecoration: item.done ? 'line-through' : '' }}>
