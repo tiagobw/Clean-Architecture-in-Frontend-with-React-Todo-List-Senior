@@ -1,11 +1,15 @@
-export default class TodoList {
+import Observable from './Observable';
+
+export default class TodoList extends Observable {
   items: any[];
 
   constructor(items?: any[]) {
+    super();
     this.items = [];
     if (items) {
       for (const item of items) {
         this.items.push({
+          id: item.id,
           description: item.description,
           done: item.done,
         });
@@ -24,16 +28,19 @@ export default class TodoList {
       done: false,
     };
     this.items.push(item);
+    this.notify('addItem', item);
     return new TodoList(this.items);
   }
 
   async removeItem(item: any) {
     this.items.splice(this.items.indexOf(item), 1);
+    this.notify('removeItem', item);
     return new TodoList(this.items);
   }
 
   async toggleDone(item: any) {
     item.done = !item.done;
+    this.notify('toggleDone', item);
     return new TodoList(this.items);
   }
 

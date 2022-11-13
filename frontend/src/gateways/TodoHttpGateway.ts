@@ -6,12 +6,12 @@ export default class TodoHttpGateway implements TodoGateway {
   constructor(readonly httpClient: HttpClient, readonly baseUrl: string) {}
 
   async getTodos(): Promise<any> {
-    const todosData = await this.httpClient.get(`${this.baseUrl}/todos`);
+    const todosData = await this.httpClient.get(`${this.baseUrl}`);
     const todoList = new TodoList(todosData);
     return todoList;
   }
   async addItem(item: any): Promise<any> {
-    await this.httpClient.post(`${this.baseUrl}/todos`, item);
+    await this.httpClient.post(`${this.baseUrl}`, item);
   }
   async updateItem(item: any): Promise<any> {
     await this.httpClient.put(`${this.baseUrl}/${item.id}`, item);

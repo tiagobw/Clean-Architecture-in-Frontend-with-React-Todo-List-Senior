@@ -1,5 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import TodoListView from '../components/TodoListView';
+import TodoList from '../entities/TodoList';
 import TodoHttpGateway from '../gateways/TodoHttpGateway';
 import TodoMemoryGateway from '../gateways/TodoMemoryGateway';
 import AxiosAdapter from '../infra/AxiosAdapter';
@@ -8,7 +9,8 @@ test('Deve testar a tela de todo list', async function () {
   // const baseUrl = 'http://localhost:3000';
   // const httpClient = new AxiosAdapter();
   // const todoGateway = new TodoHttpGateway(httpClient, baseUrl);
-  const todoGateway = new TodoMemoryGateway();
+  const todoList = new TodoList();
+  const todoGateway = new TodoMemoryGateway(todoList);
   const wrapper = render(<TodoListView todoGateway={todoGateway} />);
 
   await waitFor(() => {

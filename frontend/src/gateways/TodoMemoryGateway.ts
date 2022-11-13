@@ -1,10 +1,10 @@
+import TodoList from '../entities/TodoList';
 import TodoGateway from './TodoGateway';
 
 export default class TodoMemoryGateway implements TodoGateway {
-  todos: any[];
-
-  constructor() {
-    this.todos = [
+  constructor(readonly todoList: TodoList) {
+    this.todoList = todoList;
+    this.todoList.items = [
       {
         id: this.generateId(),
         description: 'Estudar TypeScript',
@@ -24,21 +24,21 @@ export default class TodoMemoryGateway implements TodoGateway {
   }
 
   async getTodos(): Promise<any> {
-    return this.todos;
+    return this.todoList;
   }
 
   async addItem(item: any): Promise<any> {
-    this.todos.push(item);
+    this.todoList.items.push(item);
   }
 
   async updateItem(item: any): Promise<any> {
-    const todo = this.todos.find((todo) => todo.id === item.id);
+    const todo = this.todoList.items.find((todo) => todo.id === item.id);
     if (todo) todo.done = item.done;
   }
 
   async removeItem(id: string): Promise<any> {
-    const todo = this.todos.find((todo) => todo.id === id);
-    if (todo) this.todos.splice(this.todos.indexOf(todo), 1);
+    const todo = this.todoList.items.find((todo) => todo.id === id);
+    if (todo) this.todoList.items.splice(this.todoList.items.indexOf(todo), 1);
   }
 
   generateId() {
