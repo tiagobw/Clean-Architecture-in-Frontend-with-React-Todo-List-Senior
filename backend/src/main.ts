@@ -23,6 +23,7 @@ const todos = [
 ];
 
 app.get('/todos', function (req: Request, res: Response) {
+  console.log('GET /todos');
   res.json(todos);
 });
 
@@ -38,7 +39,7 @@ app.delete('/todos/:id', function (req: Request, res: Response) {
 });
 
 app.put('/todos/:id', function (req: Request, res: Response) {
-  console.log('req:', req)
+  console.log('req:', req);
   const todo = todos.find((todo) => todo.id === req.params.id);
   if (todo) todo.done = req.body.done;
   res.end();
