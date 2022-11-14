@@ -29,6 +29,7 @@ export default class TodoList extends Observable {
     };
     this.items.push(item);
     this.notify('addItem', item);
+    return item;
   }
 
   async removeItem(item: any) {
