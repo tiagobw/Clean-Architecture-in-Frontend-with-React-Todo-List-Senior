@@ -9,7 +9,6 @@ test('Deve testar a tela de todo list', async function () {
   // const baseUrl = 'http://localhost:3000';
   // const httpClient = new AxiosAdapter();
   // const todoGateway = new TodoHttpGateway(httpClient, baseUrl);
-  const todoList = new TodoList();
   const todoGateway = new TodoMemoryGateway();
   const wrapper = render(<TodoListView todoGateway={todoGateway} />);
 
