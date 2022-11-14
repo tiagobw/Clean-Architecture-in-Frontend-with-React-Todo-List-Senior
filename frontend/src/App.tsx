@@ -1,11 +1,11 @@
 import TodoListView from './components/TodoListView';
-import TodoHttpGateway from './gateways/TodoHttpGateway';
-import AxiosAdapter from './infra/AxiosAdapter';
+import TodoGateway from './gateways/TodoGateway';
 
-const App = () => {
-  const baseUrl = 'http://localhost:3000/todos';
-  const axiosAdapter = new AxiosAdapter();
-  const todoGateway = new TodoHttpGateway(axiosAdapter, baseUrl);
+type AppProps = {
+  todoGateway: TodoGateway;
+};
+
+const App = ({ todoGateway }: AppProps) => {
   return <TodoListView todoGateway={todoGateway} />;
 };
 
