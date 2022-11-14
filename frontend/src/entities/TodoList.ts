@@ -29,19 +29,16 @@ export default class TodoList extends Observable {
     };
     this.items.push(item);
     this.notify('addItem', item);
-    return new TodoList(this.items);
   }
 
   async removeItem(item: any) {
     this.items.splice(this.items.indexOf(item), 1);
     this.notify('removeItem', item);
-    return new TodoList(this.items);
   }
 
   async toggleDone(item: any) {
     item.done = !item.done;
     this.notify('toggleDone', item);
-    return new TodoList(this.items);
   }
 
   getItem(description: string) {
